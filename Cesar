@@ -1,0 +1,88 @@
+#pragma once
+#include <iostream>
+#include <string>
+
+using namespace std;
+class Cesar
+{
+public:
+    Cesar(int);
+    int clave;
+    string cifrado(string);
+    string descifrado(string);
+    int modulo(int, int);
+    string alfabeto = "abcdefghijklmnopqrstuvwxyz ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    string mensaje;
+};
+
+
+/////////////////////////////////////////////////////////
+#include "Cesar.h"
+#include <iostream>
+#include <string>
+
+using namespace std;
+Cesar::Cesar(int clave_n) {
+    clave = clave_n;
+}
+
+string Cesar::cifrado(string mensaje) {
+    string cifrado;
+    int maximo;
+    for (int i = 0; i < mensaje.size(); ++i) {
+        maximo = alfabeto.find(mensaje[i]);
+        maximo += clave;
+
+        if (maximo >= alfabeto.size())
+            maximo = modulo(maximo, alfabeto.size());
+        cifrado.push_back(alfabeto[maximo]);
+    }
+    return cifrado;
+}
+
+
+string Cesar::descifrado(string mensaje) {
+    string descifrado;
+    int maximo;
+    for (int i = 0; i < mensaje.size(); ++i) {
+        maximo = alfabeto.find(mensaje[i]);
+        maximo -= clave;
+
+        if (maximo >= alfabeto.size()) {
+            maximo = modulo(maximo, alfabeto.size());
+        }
+        descifrado.push_back(alfabeto[maximo]);
+    }
+    return descifrado;
+}
+
+int Cesar::modulo(int a, int b) {
+    if (a >= 0)
+        return a - (a / b) * b;
+    else
+        return a - ((a / b) - 1) * b;
+}
+
+////////////////////////////////////////////////////////
+#include <iostream>
+#include <string>
+#include "Cesar.h"
+
+using namespace std;
+
+int main()
+{
+    int clave_n;
+    string mensaje;
+    cout << "Introduzca el mensaje: ";
+    getline(cin, mensaje);
+    cout << "Introduzca la clave: ";
+    cin >> clave_n;
+    Cesar algo(clave_n);
+    string mensajecifrado, mensajedescifrado;
+    mensajecifrado = algo.cifrado(mensaje);
+    cout << mensajecifrado << endl;
+    mensajedescifrado = algo.descifrado(mensajecifrado);
+    cout << mensajedescifrado;
+    return 0;
+}
