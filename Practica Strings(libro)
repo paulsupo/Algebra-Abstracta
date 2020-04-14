@@ -1,0 +1,297 @@
+//find_first_of: encuentra la primera cincidencia de cada uno de los caracteres en busqueda.Busca cada letra por separado.
+//find_first_not_of:encuentra la primera conincidencia en la que no conincide con la cadena dada para la nusqueda
+
+///Ejercicio 18.7//////////////////////////////////
+#include <iostream>
+#include <string>
+using namespace std;
+
+int modulo(int a,int b){
+    if(a>=0)
+        return a-(a/b)*b;
+    else
+        return a-((a/b)-1)*b;
+    }
+
+string alfabeto="abcdefghijklmnopqrstuvwxyz ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+
+string cod(int clave, string mensaje){
+  int maximo;
+  string cifrado;
+  for(int i=0;i<mensaje.size();i++){
+    maximo=alfabeto.find(mensaje[i]);
+    maximo+=clave;
+    if(maximo>=alfabeto.size() )
+      maximo=modulo(maximo,alfabeto.size());
+    cifrado+=alfabeto[maximo];
+  }
+  return cifrado;
+}
+
+string des(int clave, string mensaje){
+  int maximo;
+  string cifrado;
+  for(int i=0;i<mensaje.size();i++){
+    maximo=alfabeto.find(mensaje[i]);
+    maximo-=clave;
+    if(maximo>=alfabeto.size() )
+      maximo=modulo(maximo,alfabeto.size());
+    cifrado+=alfabeto[maximo];
+  }
+  return cifrado;
+}
+
+int main() {
+  string hola="abc", fin,desic;
+  fin=cod(3,hola);
+  cout<<fin<<endl;
+  desic=des(3,fin);
+  cout<<desic<<endl;
+}
+
+
+///Ejercicio 18.11/////////////////////////////
+#include <iostream>
+#include <string>
+#include <sstream>
+using namespace std;
+
+int main() {
+  string a="Jose ";
+  string b="Tito ";
+  ostringstream str;
+  str<<a<<b;
+  cout<<str.str();
+}
+
+///Ejercicio 18.12/////////////////////////////
+
+#include <iostream>     
+#include <string>      
+#include <cstddef>
+#include <stdio.h>
+#include <string.h>
+using namespace std;
+
+void reemplazar(string palabra, string letra, string &censura){
+  int j;
+  string nel="*";
+  for(int i=0;i<palabra.size();i++){
+    j=palabra.find(letra);
+    if(j!=-1){
+      palabra.replace(j,letra.size(),nel);
+      censura.replace(j,letra.size(),letra);
+    }
+    else
+      i++;
+  } 
+  cout<<censura<<endl<<endl;
+}
+
+  string cuerpo=" 0 ";
+  string cuero="/";
+  string cuer1="|";
+  string cuer2=" | ";
+  string cuer3="/ ";
+
+void imprimir(int vidas){
+  
+  if(vidas==6)
+    cout<<cuerpo<<endl;
+  
+  if(vidas==5)
+    cout<<cuerpo<<endl<<cuero<<endl;
+
+  if(vidas==4)
+    cout<<cuerpo<<endl<<cuero<<cuer1<<endl;
+
+  if(vidas==3){
+    cout<<cuerpo<<endl<<cuero<<cuer1;
+    printf("%c", 92);
+    cout<<endl;
+  }
+
+  if(vidas==2){
+    cout<<cuerpo<<endl<<cuero<<cuer1;
+    printf("%c", 92);
+    cout<<endl<<cuer2<<endl;
+  }
+
+  if(vidas==1){
+    cout<<cuerpo<<endl<<cuero<<cuer1;
+    printf("%c", 92);
+    cout<<endl<<cuer2<<endl<<cuer3<<endl;
+  }
+
+  if(vidas==0){
+    cout<<cuerpo<<endl<<cuero<<cuer1;
+    printf("%c", 92);
+    cout<<endl<<cuer2<<endl<<cuer3;
+    printf("%c", 92);
+    cout<<endl<<"GAME OVER"<<endl;
+  }
+}
+
+int main(){
+  int otra=1;
+  while (otra==1){
+  string palabra="elefante";
+  string censura, letra, temp;
+  for(int i=0; i<palabra.size(); i++){
+    censura+="X";
+  }
+
+  temp=palabra;
+  cout<<"Adivine la palabra:"<<censura<<endl<<endl;
+  for(int vidas=7; vidas>0 ; ){
+    cout<<"Introduzca una letra: ";
+    cin>>letra;
+    int pos=palabra.find(letra);
+    if(pos==-1){
+      vidas--;
+      imprimir(vidas);
+    }
+    else{
+      reemplazar(palabra,letra,censura);
+    }
+    if(censura==temp){
+      cout<<"felicidades!!! adivino mi palabra. desea jugar otra ves/si(1),no(2)";
+      break;
+    }
+  }
+  
+  cin>>otra;
+  }
+}
+
+
+///Ejercicio 18.19/////////////////////////////
+
+#include <iostream>
+#include <string>
+using namespace std;
+
+int main()
+{
+    string a, b="******", c;
+    getline(cin, a);
+    int j = a.size() / 2;
+    for (int i = 0; i < j; i++) { c += a[i]; }
+    c += b;
+    for (j; j < a.size(); j++) { c += a[j]; }
+    cout << c << endl;
+}
+
+///Ejercicio 18.21/////////////////////////////
+#include <iostream>     
+#include <string>      
+#include <cstddef>
+#include <stdio.h>
+#include <string.h>
+using namespace std;
+
+int main (){
+  string str;
+  getline(cin,str);
+  size_t found = str.find_first_of(",.:;-");
+  while (found!=string::npos)
+  {
+    str[found]=' ';
+    found=str.find_first_of(",.:;-",found+1);
+  }
+  char p[str.size()]; 
+  
+  int i; 
+  for (i = 0; i < sizeof(p); i++) { 
+    p[i] = str[i]; 
+  } 
+  char * nuevo;
+  nuevo = strtok (p," ");
+  while (nuevo != NULL)
+  {
+    printf ("%s\n",nuevo);
+    nuevo = strtok (NULL, " ");
+  }
+}
+
+///Ejercicio 18.22/////////////////////////////
+#include <iostream>
+#include <string>
+using namespace std;
+
+int main ()
+{
+  string str;
+  getline(cin,str);
+  for (string::reverse_iterator rit=str.rbegin(); rit!=str.rend(); ++rit)
+    cout << *rit;
+  return 0;
+}
+
+///Ejercicio 18.27/////////////////////////////
+#include <iostream>
+#include <string>
+#include <vector>
+using namespace std;
+
+bool ascendente( int a, int b ){
+    return a < b;
+  } 
+bool descendente( int a, int b){
+    return a > b;} 
+
+void cambio(vector <int> &myvector, int i, int j){
+  iter_swap(myvector.begin()+i,myvector.begin()+j );
+}
+
+void ordenar(vector <int> &myvector, bool(*compara)(int,int)){
+  for (int i = 0 ; i < myvector.size() ; i++){
+    int menor = i;
+    for(int j = i + 1 ; j < myvector.size() ; j++){
+      if ( !(*compara)( myvector[ menor ], myvector[ j ] ) )
+         menor = j ;
+    }
+    cambio(myvector, i, menor);
+  }
+}
+
+void imprimir(vector<int>myvector){
+  for (vector<int>::iterator it = myvector.begin() ; it != myvector.end(); ++it)
+    cout<< *it<< ' ' ;
+  cout<<endl;
+}
+
+
+int main ()
+{
+  vector<int> myvector;
+  int numero, orden;
+
+  cout << "Ingresa los numeros (presiona 0 para terminar):\n";
+  do {
+    cin >> numero;
+    myvector.push_back (numero);
+  } while (numero);
+
+  myvector.pop_back();
+
+  cout << "El vector alberga " << int(myvector.size()) << " numeros"<<endl;
+
+  imprimir(myvector);
+  cout << "Escriba 1 para orden ascendente:\n"<< "Escriba 2 para orden descendente: "<<endl;
+  cin >> orden;
+  if ( orden == 1 )
+ {
+ ordenar( myvector, ascendente );
+ cout << "\nElementos de datos en orden ascendente\n";
+ }
+
+ else
+ {
+ ordenar( myvector, descendente );
+ cout << "\nElementos de datos en orden descendente\n";
+ } 
+  imprimir(myvector);
+ 
+  return 0;
+}
