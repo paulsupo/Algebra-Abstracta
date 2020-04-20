@@ -1,0 +1,192 @@
+#include <iostream>
+#include <stdlib.h>
+#include <string>
+#include <string.h>
+#include <fstream>
+#include <vector>
+using namespace std;
+class Vigenere
+{
+    string clave;
+public:
+    Vigenere(string);
+    ~Vigenere();
+    string cifrado1(string);
+    string descifrado1(string);
+    string cifrado2(string);
+    string descifrado2(string);
+    int modulo(int, int);
+    void aqui(string&);
+    void limpiar(string&);
+    string abc = "abcdefghijklmnopqrstuvwxyz ABCDEFGHIJKLMNOPQRSTUVWXYZ,.";
+    void igualar(string&, string&);
+    string mensaje;
+};
+
+
+
+
+
+
+
+
+Vigenere::Vigenere(string clave_n) {
+    clave = clave_n;
+}
+
+Vigenere::~Vigenere() {
+}
+
+void Vigenere::aqui(string& mensaje) {
+    string aqui = "AQUI";
+    int j = mensaje.size();
+    for (int k = 10; k <= j; k += 14) {
+        mensaje.insert(k, aqui);
+        j = mensaje.size();
+    }
+    j = modulo(mensaje.size(), 4);
+    if (j != 0) {
+        j = 4 - j;
+        for (int i = 0; i < j; i++) {
+            mensaje += "W";
+        }
+    }
+
+}
+
+
+int Vigenere::modulo(int a, int b) {
+    if (a >= 0)
+        return a - (a / b) * b;
+    else
+        return a - ((a / b) - 1) * b;
+}
+
+void Vigenere::igualar(string& mensaje, string& clave) {
+    int max = mensaje.size();
+    for (int i = clave.size(), j = 0; i < max; i++, j++) {
+        if (j >= clave.size())
+            j = modulo(j, clave.size());
+        clave += clave[j];
+    }
+}
+
+void Vigenere::limpiar(string& mensaje) {
+    int j = mensaje.size() - 1;
+    while (mensaje[j] == 'W') {
+        mensaje.pop_back();
+        j--;
+    }
+    for (int k = 10; k < mensaje.size(); k += 10) {
+        mensaje.erase(k, 4);
+    }
+}
+
+
+string Vigenere::cifrado1(string mensaje) {
+    string devuelvo;
+    aqui(mensaje);
+    cout << mensaje << endl;
+    igualar(mensaje, clave);
+    for (int i = 0; i < mensaje.size(); i++) {
+        int uno = abc.find(mensaje[i]);
+        int dos = abc.find(clave[i]);
+        dos += uno;
+        if (dos >= abc.size())
+            dos = modulo(dos, abc.size());
+
+        devuelvo += abc[dos];
+    }
+    return devuelvo;
+}
+
+string Vigenere::descifrado1(string mensaje) {
+    string devuelvo;
+    for (int i = 0; i < mensaje.size(); i++) {
+        int uno = abc.find(clave[i]);
+        int dos = abc.find(mensaje[i]);
+        dos -= uno;
+        if (dos >= abc.size())
+            dos = modulo(dos, abc.size());
+
+        devuelvo += abc[dos];
+    }
+    cout << devuelvo << endl;
+    limpiar(devuelvo);
+    return devuelvo;
+}
+
+
+string Vigenere::cifrado2(string mensaje) {
+    string devuelvo;
+    aqui(mensaje);
+    cout << mensaje << endl;
+    igualar(mensaje, clave);
+    cout << clave << endl;
+    for (int i = 0; i < mensaje.size(); i++) {
+        int uno = mensaje[i];
+        int dos = clave[i];
+        dos += uno;
+        if (dos > 126) {
+
+            dos += 32;
+            dos = modulo(dos, 126);
+        }
+        char temp;
+        temp = dos;
+
+        devuelvo += temp;
+    }
+    return devuelvo;
+}
+
+string Vigenere::descifrado2(string mensaje) {
+    string devuelvo;
+    igualar(mensaje, clave);
+    for (int i = 0; i < mensaje.size(); i++) {
+        int uno = clave[i];
+        int dos = mensaje[i];
+        dos -= uno;
+        if (dos < 32) {
+            dos -= 32;
+            dos = modulo(dos, 126);
+        }
+        char temp;
+        temp = dos;
+        devuelvo += temp;
+    }
+    cout << devuelvo << endl;
+    limpiar(devuelvo);
+    cout << devuelvo << endl;
+
+    return devuelvo;
+}
+
+
+
+
+
+
+
+
+
+
+int main() {
+    int orden;
+    string clave;
+    cout << "Introduzca la clave: " << endl;
+    getline(cin, clave);
+    cout << "Seleccione el alfabeto:" << endl << "Seleccione 1 para Numerico " << endl << "Seleccione 2 para ASCCI" << endl;
+    cin >> orden;
+    Vigenere algo(clave);
+    if (orden == 1) {
+        algo.cifrado1();
+        algo.descifrado1();
+    }
+
+    if (orden == 2) {
+        algo.cifrado2();
+        algo.descifrado2();
+    }
+    return 0;
+}
