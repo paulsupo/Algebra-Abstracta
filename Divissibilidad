@@ -1,0 +1,30 @@
+#include <iostream>
+using namespace std;
+int maximo(int a, int b){
+  int q=a/b,r=a-(q*b);
+  while(r!=0){
+    a=b;
+    b=r;
+    q=a/b;
+    r=a-(q*b);
+  }
+  return b;
+}
+
+void tipos(int a, int n, int &q, int &r){
+  if(a>0){
+    q=a/n;
+    r=a-(n*q);
+  }
+
+  else{
+    q=(a/n)-1;
+    r=a-(n*q);
+  }
+}
+
+int main() {
+  int a=-255, n=11,q=0,r=0;
+  tipos(a,n,q,r);
+  cout<<q<<" "<<r<<endl;
+}
