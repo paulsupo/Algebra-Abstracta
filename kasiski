@@ -1,0 +1,121 @@
+#include <iostream>
+#include <string>
+using namespace std;
+
+int maximo(int a, int b){
+  if(b==-1)
+    b=0;
+  if(a==-1)
+    a=0;
+  if(b==0)
+    return a;
+  if(a==0)
+    return b;
+  int q=a/b,r=a-(q*b);
+  while(r!=0){
+    a=b;
+    b=r;
+    q=a/b;
+    r=a-(q*b);
+  }
+  return b;
+}
+
+int maxsepara(string texto, int tam){
+  int m=0,a=-2, temp, contador=0,def=0;
+  string busca;
+  for(int j=0; j<texto.size(); j++){
+      for(int k=j;k<j+tam;k++)
+        busca+=texto[k];
+
+      for(int i=j; ; ){
+        temp=a;
+
+        a=texto.find(busca,i++);
+        if(a==-1){
+          break;
+        }
+        if(a!=-1){
+          contador++;
+        }
+        if (contador>1){
+          if(a!=temp){
+            i+=a;
+          }
+          
+          m=maximo(m, a-temp);
+        }
+      }
+    busca.erase(0,tam);
+    contador=0;
+  }
+  return m;
+}
+
+int contar(string a, string b, string c) {
+    string temp=a;
+    int contador = 0;
+
+    for (int i = 0; i < temp.size(); i++) {
+        int k = a.find(c);
+        int j = a.find(b);
+        if (k != -1) {
+            a = a.erase(0, k);
+            contador++;
+            a = a.erase(0, c.size() );
+        }
+
+        if (j != -1) {
+            a = a.erase(0, j);
+            contador++;
+            a = a.erase(0, b.size() );
+        }
+    }
+    return contador;
+}
+
+string convmay(string cadena) {
+    for (int i = 0; i < cadena.size(); i++)
+        cadena[i] = toupper(cadena[i]);
+    return cadena;
+}
+
+int main() {
+  int tam=4,def=0,temp=0, ret;
+  string texto="MOMUDEKAPVTQEFMOEVHPAJMIICDCTIFGYAGJSPXYALUYMNSMYHVUXJELEPXJFXGCMJHKDZRYICUHYPUSPGIGMOIYHFWHTCQKMLRDITLXZLJFVQGHOLWCUHLOMDSOEKTALUVYLNZRFGBXPHVGALWQISFGRPHJOOFWGUBYILAPLALCAFAAMKLGCETDWVOELJIKGJBXPHVGALWQCSNWBUBYHCUHKOCEXJEYKBQKVYKIIEHGRLGHXEOLWAWFOJILOVVRHPKDWIHKNATUHNVRYAQDIVHXFHRZVQWMWVLGSHNNLVZSJLAKIFHXUFXJLXMTBLQVRXXHRFZXGVLRAJIEXPRVOSMNPKEPDTLPRWMJAZPKLQUZAALGZXGVLKLGJTUIITDSUREZXJERXZSHMPSTMTEOEPAPJHSMFNBYVQUZAALGAYDNMPAQOWTUHDBVTSMUEUIMVHQGVRWAEFSPEMPVEPKXZYWLKJAGWALTVYYOBYIXOKIHPDSEVLEVRVSGBJOGYWFHKBLGLXYAMVKISKIEHYIMAPXUOISKPVAGNMZHPWTTZPVXFCCDTUHJHWLAPFYULTBUXJLNSIJVVYOVDJSOLXGTGRVOSFRIICTMKOJFCQFKTINQBWVHGTENLHHOGCSPSFPVGJOKMSIFPRZPAASATPTZFTPPDPORRFTAXZPKALQAWMIUDBWNCTLEFKOZQDLXBUXJLASIMRPNMBFZCYLVWAPVFQRHZVZGZEFKBYIOOFXYEVOWGBBXVCBXBAWGLQKCMICRRXMACUOIKHQUAJEGLOIJHHXPVZWJEWBAFWAMLZZRXJEKAHVFASMULVVUTTGK";
+  for(tam; tam< (texto.size()/2)+1; tam++){
+    temp=ret;
+    def=maxsepara(texto, tam);
+    if(def>=temp){
+      ret=def;
+      cout<<"De cadenas de a "<<tam<<", el maximo es: "<<ret<<endl;}
+  }
+
+  ///////////////////////Decidimos el tamaño con el cual trabajar, en este caso sera 14
+  int max=14, cont=0, tempcont=0;
+  string tem, tem2, tem3, tem4;
+  string abc="abcdefghijklmnopqrstuvwxyz";
+
+  for(int j=0; j<max; j++){
+    for(int i=j;i<texto.size();i+=max){
+      tem+=texto[i];
+    }
+    cout<<endl;
+    cout<<tem<<endl;
+    for(int k=0; k<abc.size(); k++){
+      tem2=abc[k];
+      tem3=convmay(tem2);
+      cout<<tem3<<"=";
+      cont=contar(tem, tem2, tem3);
+      cout<<cont<<", ";
+      if(cont>=tempcont){
+        tempcont=cont;
+        tem4=abc[k];}
+    }
+    cout<<endl; 
+    cout<<"El mas grande es: "<<tem4<<"="<<tempcont<<endl;
+    tem.erase(0, tem.size());
+    cont=0, tempcont=0;
+    tem4.erase(0, tem4.size());
+  }
+}
