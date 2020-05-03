@@ -1,0 +1,142 @@
+class Vigenere
+{
+    string clave;
+public:
+    Vigenere(string);
+    ~Vigenere();
+    string cifrado1(string);
+    string descifrado1(string);
+    string cifrado2(string);
+    string descifrado2(string);
+    int modulo(int, int);
+    string abc = "abcdefghijklmnopqrstuvwxyz ABCDEFGHIJKLMNOPQRSTUVWXYZ,.";
+    void igualar(string&, string&);
+    string mensaje;
+};
+
+
+Vigenere::Vigenere(string clave_n) {
+    clave = clave_n;
+}
+
+Vigenere::~Vigenere() {
+}
+
+int Vigenere::modulo(int a, int b) {
+    if (a >= 0)
+        return a - (a / b) * b;
+    else
+        return a - ((a / b) - 1) * b;
+}
+
+void Vigenere::igualar(string& mensaje, string& clave) {
+    int max = mensaje.size();
+    for (int i = clave.size(), j = 0; i < max; i++, j++) {
+        if (j >= clave.size())
+            j = modulo(j, clave.size());
+        clave += clave[j];
+    }
+}
+
+
+string Vigenere::cifrado1(string mensaje) {
+    string devuelvo;
+    igualar(mensaje, clave);
+    for (int i = 0; i < mensaje.size(); i++) {
+        int uno = abc.find(mensaje[i]);
+        int dos = abc.find(clave[i]);
+        dos += uno;
+        if (dos >= abc.size())
+            dos = modulo(dos, abc.size());
+
+        devuelvo += abc[dos];
+    }
+    return devuelvo;
+}
+
+string Vigenere::descifrado1(string mensaje) {
+    string devuelvo;
+    for (int i = 0; i < mensaje.size(); i++) {
+        int uno = abc.find(clave[i]);
+        int dos = abc.find(mensaje[i]);
+        dos -= uno;
+        if (dos >= abc.size())
+            dos = modulo(dos, abc.size());
+
+        devuelvo += abc[dos];
+    }
+    return devuelvo;
+}
+
+
+string Vigenere::cifrado2(string mensaje) {
+    string devuelvo;
+
+    igualar(mensaje, clave);//////////////////////////////////////////////////////////
+    for (int i = 0; i < mensaje.size(); i++) {
+        int uno = mensaje[i];
+        int dos = clave[i];
+        dos += uno;
+        if (dos >= 126) {
+            dos = modulo(dos, 126);
+            dos += 32;
+        }
+        char temp;
+        temp = dos;
+
+        devuelvo += temp;
+    }
+    return devuelvo;
+}
+
+string Vigenere::descifrado2(string mensaje) {
+    string devuelvo;
+    for (int i = 0; i < mensaje.size(); i++) {
+        int uno = clave[i];
+        int dos = mensaje[i];
+        dos -= uno;
+        if (dos <= 0) {
+            dos = modulo(dos, 126);
+            dos -= 32;
+        }
+        char temp;
+        temp = dos;
+        devuelvo += temp;
+    }
+    return devuelvo;
+}
+
+
+
+
+
+
+
+
+
+int main() {
+    int orden;
+    string clave, mensaje, cifrado, descifrado;
+    cout << "Introduzca el mensaje: " << endl;
+    getline(cin, mensaje);
+    cout << "Introduzca la clave: " << endl;
+    getline(cin, clave);
+    cout << "Seleccione el alfabeto:" << endl << "Seleccione 1 para Numerico " << endl << "Seleccione 2 para ASCCI" << endl;
+    cin >> orden;
+    Vigenere algo(clave);
+    
+    if (orden == 1) {
+        cifrado = algo.cifrado1(mensaje);
+        cout << cifrado << endl;
+        descifrado = algo.descifrado1(cifrado);
+        cout << descifrado << endl;
+    }
+
+    if (orden == 2) {
+        cifrado = algo.cifrado2(mensaje);
+        cout << cifrado << endl;
+        descifrado = algo.descifrado2(cifrado);
+        cout << descifrado << endl;
+    }
+    return 0;
+}
