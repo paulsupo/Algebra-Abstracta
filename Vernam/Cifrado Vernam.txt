@@ -1,0 +1,124 @@
+#include <iostream>
+#include <bitset>
+#include <math.h>
+#include <string>
+using namespace std;
+
+class Vigenere
+{
+    string clave;
+public:
+    Vigenere(string);
+    ~Vigenere();
+    string cifrado1(string);
+    string suma(string, string);
+    string abc = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    void igualar(string&, string&);
+    string mensaje;
+    int modulo(int, int);
+    int potenciar(int,int);
+    int convertirbit(string);
+};
+
+
+
+Vigenere::Vigenere(string clave_n) {
+    clave = clave_n;
+}
+
+Vigenere::~Vigenere() {
+}
+
+int Vigenere::modulo(int a, int b) {
+    if (a >= 0)
+        return a - (a / b) * b;
+    else
+        return a - ((a / b) - 1) * b;
+}
+
+int Vigenere::potenciar(int base, int elevar) {
+	int total, i;
+	total = 1; i = 0;
+	for (i; i < elevar; i++) {
+		total *= base;
+	}
+	return total;
+}
+
+int Vigenere::convertirbit(string mensaje) {
+	int len = mensaje.size() - 1, algo = len;
+	int num, dos;
+	num = 0; dos = 2;
+	int ii;
+	for (int i = 0; i <= algo; i++, len = algo - i) {
+		ii = i;
+		if (mensaje[len] == '1')
+			num += potenciar(dos, ii);
+	}
+	return num;
+}
+
+string Vigenere::suma(string a, string b){
+  string temp;
+  for(int i=0; i < a.size(); i++){
+    if(a[i]=='1' && b[i]=='0'){
+      temp+="1";}
+
+    if(a[i]=='0' && b[i]=='1'){
+      temp+="1";}
+
+    if(a[i]=='1' && b[i]=='1'){
+      temp+="0";}
+
+    if(a[i]=='0' && b[i]=='0'){
+      temp+="0";}
+  }
+  return temp;
+}
+
+void Vigenere::igualar(string& mensaje, string& clave) {
+    int max = mensaje.size();
+    for (int i = clave.size(), j = 0; i < max; i++, j++) {
+        if (j >= clave.size())
+            j = modulo(j, clave.size());
+        clave += clave[j];
+    }
+}
+
+
+string Vigenere::cifrado1(string mensaje) {
+    const int n=5;
+    int temp4;
+    int resultado;
+    string temp, temp2, temp3;
+    string devuelvo;
+    //igualar(mensaje, clave);
+    for (int i = 0; i < mensaje.size(); i++) {
+        int uno = abc.find(mensaje[i]) +1;
+        bitset<n> foo(uno);
+        temp=foo.to_string();
+        int dos = abc.find(clave[i]) +1;
+        bitset<n> bar(dos);
+        temp2=bar.to_string();
+        temp3=suma(temp, temp2);
+        temp4=convertirbit(temp3) -1;
+
+        devuelvo += abc[temp4];
+    }
+    return devuelvo;
+}
+
+int main() {
+    string  mensaje="TARINGA",clave="MXUZOPT", cifrado, descifrado;
+    //cout << "Introduzca el mensaje: " << endl;
+    //getline(cin, mensaje);
+    //cout << "Introduzca la clave: " << endl;
+    //getline(cin, clave);
+    Vigenere algo(clave);
+    
+    cifrado = algo.cifrado1(mensaje);
+    cout << cifrado << endl;
+    descifrado = algo.cifrado1(cifrado);
+    cout << descifrado << endl;
+    return 0;
+}
