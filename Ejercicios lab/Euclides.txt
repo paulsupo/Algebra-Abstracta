@@ -22,29 +22,24 @@ ZZ modulo(ZZ a, ZZ b){
 //Execution Time: 8e-06
 ZZ algoritmo1(ZZ a,ZZ b){
   //cout<<"Ingreso con los numeros "<<a<<" y "<<b<<endl;
-  ZZ r;
-  while(true){
-    r=modulo(a,b);
+  ZZ r=modulo(a,b);
+  while(r!=0){
     //cout<<"r= "<<r<<endl;
-    if(r==0)
-      return b;
     a=b;
     //cout<<"a= "<<a<<endl;
     b=r;
     //cout<<"b= "<<b<<endl<<endl;
   }
+  return b;
 }
 
 
 //Execution Time: 2e-06
 ZZ algoritmo2(ZZ a,ZZ b){
   //cout<<"Ingreso con los numeros "<<a<<" y "<<b<<endl;
-  ZZ r;
-  while(true){
-    r=modulo(a,b);
+  ZZ r=modulo(a,b);
+  while(r!=0){
     //cout<<"r= "<<r<<endl;
-    if(r==0)
-      return b;
     if(r>(b/2)){
       r=b-r;
       //cout<<"r= "<<r<<endl;
@@ -54,6 +49,7 @@ ZZ algoritmo2(ZZ a,ZZ b){
     b=r;
     //cout<<"b= "<<b<<endl<<endl;
   }
+  return b;
 }
 
 
