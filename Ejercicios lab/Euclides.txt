@@ -46,7 +46,8 @@ ZZ algoritmo2(ZZ a,ZZ b){
     if(r==0)
       return b;
     if(r>(b/2)){
-      //r=b-r;cout<<"r= "<<r<<endl;
+      r=b-r;
+      //cout<<"r= "<<r<<endl;
     }
     a=b;
     //cout<<"a= "<<a<<endl;
