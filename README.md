@@ -1,2 +1,2 @@
 # Algebra-Abstracta
-Paúl Pharf Supo Portugal
+Paúl Pharaf Supo Portugal
