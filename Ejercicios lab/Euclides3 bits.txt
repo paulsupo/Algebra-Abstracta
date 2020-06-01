@@ -1,0 +1,92 @@
+#include <iostream>
+#include <string>
+#include <bitset>
+using namespace std;
+
+int potenciar(int base, int elevar) {
+	int total, i;
+	total = 1; i = 0;
+	for (i; i < elevar; i++) {
+		total *= base;
+	}
+	return total;
+}
+
+int convertirbit(string mensaje) {
+	int len = mensaje.size() - 1, algo = len;
+	int num, dos;
+	num = 0; dos = 2;
+	int ii;
+	for (int i = 0; i <= algo; i++, len = algo - i) {
+		ii = i;
+		if (mensaje[len] == '1')
+			num += potenciar(dos, ii);
+	}
+	return num;
+}
+
+int positivo(int a){
+  if(a<0)
+    a*=-1;
+  return a;
+}
+
+int modulo(int a, int b){
+    if(a>=0)
+        return a-(a/b)*b;
+    else
+        return a-((a/b)-1)*b;
+}
+
+string bit(int num){
+  string numero;
+  while(num>0){
+    if(num%2==0)
+        numero+="0";
+    else
+        numero+="1";
+    num/=2;
+  }
+  string nuevo;
+    for(int i=numero.size()-1; i>=0;i--)nuevo.push_back(numero[i]);
+  return nuevo;
+}
+
+
+
+
+int algoritmo4(int a,int b){
+  int dos, res;
+  res=positivo(a)- positivo(b);
+  string a1=bit(a),b1=bit(b), res1=bit(res);
+  dos=2;
+  bitset <4> aa(a1);
+  bitset <4> bb(b1);
+  bitset <4> rr(res1);
+
+
+  if(positivo(convertirbit(bb.to_string())) > positivo(convertirbit(aa.to_string()))){
+    return algoritmo4(convertirbit(bb.to_string()), convertirbit(aa.to_string()));}
+
+  if(convertirbit(bb.to_string())==0)
+    return convertirbit(aa.to_string());
+
+  if( (modulo(convertirbit(aa.to_string()),dos)==0) && (modulo(convertirbit(bb.to_string()),dos)==0) ){
+    return 2*algoritmo4( convertirbit((aa>>=1).to_string()), convertirbit((bb>>=1).to_string()) );}
+
+  if( (modulo(convertirbit(aa.to_string()),dos)==0) && (modulo(convertirbit(bb.to_string()),dos)!=0) ){
+    return algoritmo4(convertirbit((aa>>=1).to_string()), convertirbit(bb.to_string()));}
+
+  if( (modulo(a,dos)!=0) && (modulo(b,dos)==0) ){
+    return algoritmo4(convertirbit(aa.to_string()), convertirbit((bb>>=1).to_string()));}
+      
+  return algoritmo4( convertirbit((rr>>=1).to_string())  , convertirbit(bb.to_string()) );
+}
+
+int main() {
+  int a,b;
+  a=4, b=8;
+  int c=algoritmo4(a, b);
+  cout<<"resultado final= "<<c<<endl;
+
+}
