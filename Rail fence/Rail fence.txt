@@ -1,0 +1,59 @@
+#include <iostream>
+#include<string>
+using namespace std;
+
+class cifrado{
+private:
+  int x;
+public:
+  cifrado(int);
+  string cifrar(string m);
+  string decifrar(string m);
+};
+
+cifrado::cifrado(int _x){
+  x=_x;
+}
+
+string cifrado::cifrar(string m){
+  int c=m.length();
+  bool anuma=true;
+  string mensaji,parte,parta;
+  int kaguya=x+(x-3),contador=0,contador2=x,contador3=0,smash=kaguya+1;
+ while(anuma==true){
+    if(contador>=c){
+      contador2-=1;
+      contador3+=+1;
+      contador=contador3;
+      mensaji+=parte;
+      parte=parta;
+      kaguya-=2;
+      smash=kaguya+1;
+      if (kaguya<1){
+        kaguya=x+(x-3);
+        smash=kaguya+1;
+      }
+      if(contador2==0)
+        anuma=false;
+      
+    }
+    else if(contador<c){
+      parte=parte+m[contador];
+      contador=contador+smash;
+    }
+  }
+  return mensaji;
+}
+
+int main() {
+  string y;
+  int clave;
+  int aea;
+  cout << "Ingrese su mensaje" << endl;
+  getline(cin, y);
+  cout << "Ingerese la clave" << endl;
+  cin >> clave;
+  cifrado algo(clave);
+  string cifrado=algo.cifrar(y);
+  cout<<cifrado<<endl;
+}
