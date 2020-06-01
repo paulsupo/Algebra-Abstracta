@@ -1,0 +1,82 @@
+#include <iostream>
+#include <string>
+using namespace std;
+
+class monobi{
+  string mensaje;
+  public:
+  string num="DE NARI OS";
+  string dos="BCFGHJKLMÑ";
+  string siete="PQTUVWXYZ#";
+  string cifrar(string mensaje);
+  string descifrar(string mensaje);
+};
+
+string monobi::cifrar(string mensaje){
+  string cifrado;
+  for(int i=0; i<mensaje.size(); i++){
+    if( (num.find(mensaje[i]) !=-1) ){
+      int pos=num.find(mensaje[i]);
+      if(mensaje[i]==' ')
+        cifrado+=" ";
+
+      else
+        cifrado+=to_string(pos);
+    }
+
+    if( (dos.find(mensaje[i]) !=-1) ){
+      int pos=dos.find(mensaje[i]);
+      cifrado+=to_string(2);
+      cifrado+=to_string(pos);
+    }
+
+    if( (siete.find(mensaje[i]) !=-1) ){
+      int pos=siete.find(mensaje[i]);
+      cifrado+=to_string(7);
+      cifrado+=to_string(pos);
+    }
+  }
+  return cifrado;
+}
+
+string monobi::descifrar(string mensaje){
+  string descifrado, temp;
+  int pos;
+  for(int i=0; i<mensaje.size(); i++){
+    if( (mensaje[i]) !='2' && (mensaje[i])!='7'){
+      if(mensaje[i]==' ')
+        descifrado+=" ";
+      else{
+        temp=mensaje[i];
+        pos=stoi(temp);
+        descifrado+=num[pos];
+      }
+
+    }
+
+    if( (mensaje[i]) =='2' && (mensaje[i])!='7') {
+      i++;
+      temp=mensaje[i];
+      pos=stoi(temp);
+      descifrado+=dos[pos];
+    }
+
+    if( (mensaje[i]) !='2' && (mensaje[i])=='7') {
+      i++;
+      temp=mensaje[i];
+      pos=stoi(temp);
+      descifrado+=siete[pos];
+    }
+  }
+  return descifrado;
+}
+
+int main() {
+  string mensaje="ESTE ES UN MENSAJE CIFRADO";
+  monobi algo;
+  string cifrado=algo.cifrar(mensaje);
+  cout<<cifrado<<endl<<endl;
+  string descifrado=algo.descifrar(cifrado);
+  cout<<descifrado<<endl;
+  return 0;
+}
