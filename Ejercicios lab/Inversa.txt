@@ -1,0 +1,59 @@
+#include <iostream>
+using namespace std;
+
+int modulo(int a, int b){
+    if(a>=0)
+        return a-(a/b)*b;
+    else
+        return a-((a/b)-1)*b;
+}
+
+
+int mcd(int a,int b){
+  int r;
+  while(true){
+    r=modulo(a,b);
+    if(r==0)
+      return b;
+    if(r>(b/2)){
+      r=b-r;
+    }
+    a=b;
+    b=r;
+  }
+}
+
+int extendido(int a,int b){
+  int r1=a, r2=b, s1=1, s2=0, t1=0, t2=1, r,s,t,q,i=1;
+  while (r2>0){
+    q=r1/r2;
+
+    r=r1-q*r2;
+    r1=r2; r2=r;
+
+    s=s1-q*s2;
+    s1=s2; s2=s;
+
+    t=t1-q*t2;
+    t1=t2; t2=t;
+     }
+  return s1;
+}
+
+int inversa(int a, int n){
+  int inv=0;
+  if(mcd(a,n)!=1)
+    cout<<"Este numero no tiene inversa"<<endl;
+    
+  else{
+    inv=extendido(a,n);
+    if(inv < 0)
+      inv=modulo(inv,n);
+  }
+  return inv;
+}
+
+int main() {
+  int a=1,n=7;
+  cout<<inversa(117,244)<<endl;
+}
