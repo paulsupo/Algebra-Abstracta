@@ -1,0 +1,137 @@
+#include <stdlib.h>
+#include <time.h>
+#include <iostream>
+#include <random>
+#include <string>
+
+using namespace std;
+
+class Afin{
+  int claveAc, claveBc,claveAd, claveBd;
+  public:
+  Afin();
+  Afin(int,int);
+  int modulo(int,int);
+  int random();
+  int mcd(int, int);
+  int inversa(int, int);
+  int extendido(int, int);
+  string alfabeto="abcdefghijklmnopqrstuvwxyz ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-";
+  int generarclaveA(int);
+  string cifrado(string);
+  string descifrado(string);
+};
+
+Afin::Afin(){
+	int num = alfabeto.size();
+	claveAc = generarclaveA(num);
+	claveBc = random();
+}
+
+Afin::Afin(int a, int b){
+	claveAd = inversa(a, alfabeto.size());
+	claveBd = b;
+}
+
+int Afin::generarclaveA(int tamaño){
+	int a = random();
+	int b = mcd(a, tamaño);
+	if (b == 1){
+		return a;
+	}
+	else
+		return generarclaveA(tamaño);
+}
+
+int Afin::modulo(int a, int b){
+    if(a>=0)
+        return a-(a/b)*b;
+    else
+        return a-((a/b)-1)*b;
+}
+
+int Afin::random(){
+	random_device dev;
+	mt19937 rng(dev());
+	uniform_int_distribution<mt19937::result_type> random(0,alfabeto.size());
+	return random(rng);
+}
+
+int Afin::mcd(int a,int b){
+  int r;
+  while(true){
+    r=modulo(a,b);
+    if(r==0)
+      return b;
+    if(r>(b/2)){
+      r=b-r;
+    }
+    a=b;
+    b=r;
+  }
+}
+
+int Afin::extendido(int a,int b){
+  int r1=a, r2=b, s1=1, s2=0, t1=0, t2=1, r,s,t,q,i=1;
+  while (r2>0){
+    q=r1/r2;
+
+    r=r1-q*r2;
+    r1=r2; r2=r;
+
+    s=s1-q*s2;
+    s1=s2; s2=s;
+
+    t=t1-q*t2;
+    t1=t2; t2=t;
+     }
+  return s1;
+}
+
+int Afin::inversa(int a, int n){
+  int inv=0;
+  if(mcd(a,n)!=1)
+    cout<<"Este numero no tiene inversa"<<endl;
+    
+  else{
+    inv=extendido(a,n);
+    if(inv < 0)
+      inv=modulo(inv,n);
+  }
+  return inv;
+}
+
+string Afin::cifrado(string texto){
+	string cifrado;
+  int pos, temp;
+	for (int i = 0; i<texto.size(); i++){
+		temp = alfabeto.find(texto[i]);
+    pos=modulo(claveAc*temp+claveBc, alfabeto.size());
+		cifrado+=alfabeto[pos];
+	}
+	cout << "ClaveA: " << claveAc << endl;
+	cout << "ClaveB: " << claveBc << endl;
+	return cifrado;
+}
+
+string Afin::descifrado(string texto){
+	string descifrado;
+  int temp, pos;
+	for (int i = 0; i<texto.size(); i++){
+		temp = alfabeto.find(texto[i]);
+    pos=modulo(claveAd*(temp-claveBd), alfabeto.size());
+		descifrado.push_back(alfabeto[pos]);
+	}
+	return descifrado;
+}
+
+int main() {
+	Afin emisor;
+	Afin receptor(33, 41);
+	
+	string mensaje = "vamo a ratear";
+	string cifrado = emisor.cifrado(mensaje);
+	cout << cifrado<<endl;
+	string descifrado = receptor.descifrado("DO02dOd OBSO");
+	cout << descifrado<< endl;
+}
