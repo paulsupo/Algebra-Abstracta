@@ -1,0 +1,77 @@
+#include <stdlib.h>
+#include <time.h>
+#include <iostream>
+#include <random>
+#include <string>
+#include <vector>
+#include <math.h>
+using namespace std;
+
+int modulo(int a, int b){
+    if(a>=0)
+        return a-(a/b)*b;
+    else
+        return a-((a/b)-1)*b;
+}
+
+int random(int max){
+	random_device dev;
+	mt19937 rng(dev());
+	uniform_int_distribution<mt19937::result_type> random(0,max);
+	return random(rng);
+}
+
+void imprimir(vector<int>myvector){
+  for (vector<int>::iterator it = myvector.begin() ; it != myvector.end(); ++it)
+    cout<< *it<< ' ' ;
+  cout<<endl;
+}
+
+int randomprimo1(int numero){
+  vector<int> primos;
+  primos.push_back(1);
+  primos.push_back(2);
+  primos.push_back(3);
+  bool primo=true;
+  for(int i=5; i<=numero; i+=2){
+    for(int j=3; j<i; j+=2){
+      if(modulo(i,j)==0)
+        primo=false;
+    }
+    if(primo==true)
+      primos.push_back(i);
+    primo=true;
+  }
+  //imprimir(primos);
+  int pos=modulo(random(primos.size()*5), primos.size() );
+  cout<<"pos= "<<pos<<endl;
+  vector<int>::iterator it = primos.begin()+pos;
+  return *it;
+}
+
+int randomprimo2(int numero){
+  vector<int> primos;
+  vector<int>::iterator temp;
+  int limite=sqrt(numero);
+
+  for(int i=1; i<=numero; i++) 
+    primos.push_back(i);
+    
+  for(int j=2; j<=limite; j++){
+    for (vector<int>::iterator it = primos.begin()+j ; it != primos.end(); it++){
+      temp=it;
+      if(modulo( *temp ,j)==0){
+        primos.erase(temp);
+        it--;
+      }
+    }
+  }
+  imprimir(primos);
+  int pos=modulo(random(primos.size()*5), primos.size() );
+  vector<int>::iterator it = primos.begin()+pos;
+  return *it;
+}
+
+int main() {
+  cout<<randomprimo2(20)<<endl;
+}
