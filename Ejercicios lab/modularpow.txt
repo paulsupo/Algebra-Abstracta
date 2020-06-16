@@ -1,0 +1,30 @@
+#include <iostream>
+#include <string>
+#include <NTL/ZZ.h>
+using namespace std;
+using namespace NTL;
+
+ZZ RSA::modulozz(ZZ a, ZZ b) {
+	if (a >= 0)
+		return a - (a / b) * b;
+	else
+		return a - ((a / b) - 1) * b;
+}
+
+ZZ RSA::modular_pow(ZZ base, ZZ exponenete, ZZ mod) {
+	ZZ result, dos;
+	result = 1, dos = 2;
+	while (exponenete > 0) {
+		if (modulozz(exponenete,dos) == 1)
+			result = (result * base) % mod;
+		exponenete >>= 1;
+		base = (base * base) % mod;
+	}
+	return result;
+}
+
+int main(){
+	ZZ a,b,c;
+	a=12,b=54,c =74;
+	cout<<modular_pow(a,b,c);
+}
