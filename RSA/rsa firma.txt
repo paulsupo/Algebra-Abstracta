@@ -1,0 +1,407 @@
+#include <iostream>
+#include <string>
+#include <sstream>// zz to string
+#include <NTL/ZZ.h>
+#include <vector>
+#include <random>
+#include <NTL/vector.h>
+using namespace std;
+using namespace NTL;
+
+class RSA {
+	ZZ claveprivada, p, q, phiden, n_priv, clavepublica_mia;
+	ZZ resto_chino(ZZ pos);
+public:
+	RSA(ZZ), RSA(ZZ, ZZ);
+	ZZ modulozz(ZZ, ZZ), mcd(ZZ, ZZ), inversa(ZZ, ZZ), potenciar(ZZ, ZZ), modular_pow(ZZ, ZZ, ZZ), randomprimo2(int);
+	ZZ stringtozz(string);
+	//bool test_primo(ZZ);
+	ZZ clavepublica_otro, n_otro, maximo;
+	int zztoint(ZZ), moduloint(int, int);
+	string inttostring(int), zztostring(ZZ);
+	string abecedario = "ABCDEFGHIJKLMNOPQRSTUVWXYZ,.-( )abcdefghijklmnopqrstuvwxyz<>*1234567890";
+	//string abecedario = "abcdefghijklmnopqrstuvwxyz( )ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
+	string cifrado_firma(string), cifrado_rubrica(string);
+	string descifrado_firma(string), descifrado_rubrica(string), igualar(string, ZZ), completar(string, int);
+};
+
+RSA::RSA(ZZ maximo_bits) {
+	maximo = maximo_bits; string tempp, tempq, temppublica;
+	p = RandomPrime_ZZ(18);
+	tempp = "122120497595163728596684018524118205111891984738584498133474975889020107903765730129909729974620259669346355654294517358657713837589248445566707127436252264939375797525571368573571036106382051569049147804344989426944287820547611206492871282777071688078003107886248600683076069242690418139046528553114958203613";
+	p = stringtozz(tempp);
+	q = RandomPrime_ZZ(18);
+	tempq = "104372189733958831358265707452590464575031915203004929767654310347456577721100525782851439498357204214257743217781113532639596955892696125711329342841017046989070470792935073008368841078846154402123345430167375289078593175965949678443102352025935637578538053457778998945023827893426076996943033359772792870791";
+	q = stringtozz(tempq);
+	n_priv = p * q;
+	phiden = (p - 1) * (q - 1);
+	clavepublica_mia = RandomPrime_ZZ(10);
+	temppublica = "136520479865496290100252913127366596608455895068151336400598895158218921072341246159995163406832388726200279984782542605155309121971097050921205963662457343760117356613221444079210822240732777061910426084732588454357107935476784633228884945706052044018754587990202296167977408031368639907808993076776064058723";
+	clavepublica_mia = stringtozz(temppublica);
+	claveprivada = modulozz(clavepublica_mia, phiden);
+	claveprivada = inversa(claveprivada, phiden);
+	claveprivada = modulozz(claveprivada, phiden);
+	cout << "p: " << p << endl << endl << "q: " << q << endl << endl;
+	cout << "N: " << n_priv<< endl << endl;
+	cout << "Fi de N: " << phiden << endl << endl;
+	cout << "Clave publica(e): " << clavepublica_mia << endl << endl;
+	cout << "Clave privada(d): " << claveprivada << endl << endl;;
+}
+
+RSA::RSA(ZZ nreceptor, ZZ clave_publica) {
+	clavepublica_otro = clave_publica;
+	n_otro = nreceptor;
+}
+
+int RSA::moduloint(int a, int b) {
+	if (a >= 0)
+		return a - (a / b) * b;
+	else
+		return a - ((a / b) - 1) * b;
+}
+
+ZZ RSA::modulozz(ZZ a, ZZ b) {
+	if (a >= 0)
+		return a - (a / b) * b;
+	else
+		return a - ((a / b) - 1) * b;
+}
+
+ZZ RSA::mcd(ZZ a, ZZ b) {
+	ZZ r;
+	while (true) {
+		r = modulozz(a, b);
+		if (r == 0)
+			return b;
+		if (r > (b / 2)) {
+			r = b - r;
+		}
+		a = b;
+		b = r;
+	}
+}
+
+ZZ RSA::inversa(ZZ entero, ZZ modulonum) {
+	if (mcd(entero, modulonum) != 1) {
+		cout << "Este numero no tiene inversa" << endl;
+		return ZZ(0);
+	}
+
+	ZZ modulo_cero = modulonum, variable, cociente;
+	ZZ variable0, variable1;
+	variable0 = 0, variable1 = 1;
+	while (entero > 1) {
+		cociente = entero / modulonum;
+		variable = modulonum;
+		modulonum = modulozz(entero, modulonum);
+		entero = variable;
+		variable = variable0;
+		variable0 = variable1 - cociente * variable0;
+		variable1 = variable;
+	}
+	if (variable1 < 0)
+		variable1 += modulo_cero;
+	return variable1;
+}
+
+ZZ RSA::potenciar(ZZ base, ZZ elevar) {
+	ZZ total, i;
+	total = 1; i = 0;
+	for (i; i < elevar; i++) {
+		total *= base;
+	}
+	return total;
+}
+
+ZZ RSA::modular_pow(ZZ base, ZZ exponenete, ZZ mod) {
+	ZZ result, dos;
+	result = 1, dos = 2;
+	while (exponenete > 0) {
+		if (modulozz(exponenete, dos) == 1)
+			result = modulozz((result * base), mod);
+		exponenete >>= 1;
+		base = (base * base) % mod;
+	}
+	return result;
+}
+
+string RSA::inttostring(int a) {
+	ostringstream temp;
+	temp << a;
+	return temp.str();
+}
+
+string RSA::zztostring(ZZ num) {
+	stringstream buffer;
+	buffer << num;
+	return buffer.str();
+}
+
+int RSA::zztoint(ZZ num) {
+	string temp = zztostring(num);
+	int numero = stoi(temp);
+	return numero;
+}
+
+ZZ RSA::stringtozz(string str) {
+	ZZ z(NTL::INIT_VAL, str.c_str());
+	return z;
+}
+
+int random(int max) {
+	random_device dev;
+	mt19937 rng(dev());
+	uniform_int_distribution<mt19937::result_type> random(0, max);
+	return random(rng);
+}
+/*
+bool RSA::test_primo(ZZ num) {
+	ZZ limite, j;
+	limite = sqtr(num);
+	for (j = 2; j <= limite; j++) {
+		if (modulozz(num, j) == 0) {
+			return false;
+		}
+	}
+	return true;
+}
+
+ZZ RSA::randomprimo2(int numero) {
+	Vec<ZZ> primos; ZZ dos, pos, temp, rand, longitud;
+	dos = 2, temp = numero;
+	ZZ minimo = (potenciar(dos, temp)) / 2;
+	ZZ maximo = (potenciar(dos, temp)) - 1;
+	cout << "El numero esta en el intervalo de " << minimo << " a " << maximo << endl;
+	for (ZZ i = minimo; i <= maximo; i++) {
+		if (test_primo(i) == true)
+			primos+=(i);
+	}
+	int ran = random(primos.length() * 5); long size = primos.length();
+	rand = ran, longitud = size;
+	ZZ pos = modulozz(rand, longitud);
+	Vec<ZZ>::iterator it = primos.begin() + pos;
+	return *it;
+}*/
+
+string RSA::igualar(string letra, ZZ maximo) {
+	string ret;
+	ZZ hueco = ZZ(letra.size());
+	hueco = maximo - hueco;
+	for (int i = 0; i < hueco; i++)
+		ret += "0";
+	ret += letra;
+	return ret;
+}
+
+string RSA::completar(string mensaje, int division) {
+	string dev;
+	int size = mensaje.size();
+	size = moduloint(size, division);
+	size = division - size;
+	if (moduloint(size, 2) == 0) {
+		for (int i = 0; i < size / 2; i++)
+			mensaje += "25";
+	}
+	if (moduloint(size, 2) != 0) {
+		for (int i = 0; i < size / 2; i++)
+			mensaje += "25";
+		mensaje += "7";
+	}
+	return mensaje;
+}
+
+ZZ RSA::resto_chino(ZZ pos) {
+	ZZ dp, dq, expP, expQ, p_resto, p1, p2, q1, q2, res, d1, d2;
+	expP = modulozz(claveprivada, p - 1);
+	expQ = modulozz(claveprivada, q - 1);
+	dp = modular_pow(modulozz(pos, p), expP, p);
+	dq = modular_pow(modulozz(pos, q), expQ, q);
+	p1 = n_priv / p;
+	p2 = n_priv / q;
+	q1 = inversa(modulozz(p1, p), p);
+	q2 = inversa(modulozz(p2, q), q);
+	d1 = modulozz(dp * p1 * q1, n_priv);
+	d2 = modulozz(dq * p2 * q2, n_priv);
+	res = d1 + d2;
+	res = modulozz(res, n_priv);
+	return res;
+}
+
+string RSA::cifrado_rubrica(string mensaje) {
+	cout << "-------------------------CIFRADO RUBRICA---------------------------------" << endl;
+	string texto, conv, temp, temp2, igua, igua2;
+	ZZ pos, tam, pos2;
+	tam = abecedario.size();
+	for (int i = 0; i < mensaje.size(); i++) {
+		pos = abecedario.find(mensaje[i]);
+		igua = zztostring(pos);
+		igua2 = zztostring(tam);
+		conv += igualar(igua, ZZ(igua2.size()));
+	}
+	string ntemp = zztostring(n_priv);
+	int bloques = ntemp.size() - 1;
+	conv = completar(conv, bloques);
+	for (int i = 0; i < conv.size(); i += bloques) {
+		for (int j = 0; j < bloques; j++) {
+			temp += conv[i + j];
+		}
+		pos2 = stringtozz(temp);
+		pos2 = resto_chino(pos2);
+		temp2 = zztostring(pos2);
+		temp2 = igualar(temp2, ZZ(ntemp.size()));
+		texto += temp2;
+		temp.clear();
+		temp2.clear();
+	}
+	return texto;
+}
+
+string RSA::cifrado_firma(string mensaje) {
+	cout << "-------------------------CIFRADO FIRMA---------------------------------" << endl;
+	string texto, conv, temp, temp2, igua, igua2;
+	ZZ pos, tam, pos2;
+	tam = abecedario.size();
+	for (int i = 0; i < mensaje.size(); i++) {
+		pos = abecedario.find(mensaje[i]);
+		igua = zztostring(pos);
+		igua2 = zztostring(tam);
+		conv += igualar(igua, ZZ(igua2.size()));
+	}
+	string ntemp = zztostring(n_otro);
+	int bloques = ntemp.size() - 1;
+	conv = completar(conv, bloques);
+	for (int i = 0; i < conv.size(); i += bloques) {
+		for (int j = 0; j < bloques; j++) {
+			temp += conv[i + j];
+		}
+		pos2 = stringtozz(temp);
+		pos2 = modular_pow(pos2, clavepublica_otro, n_otro);
+		temp2 = zztostring(pos2);
+		temp2 = igualar(temp2, ZZ(ntemp.size()));
+		texto += temp2;
+		temp.clear();
+		temp2.clear();
+	}
+	return texto;
+}
+
+string RSA::descifrado_firma(string cifrado) {
+	cout << "-------------------------DESCIFRADO FIRMA---------------------------------" << endl;
+	string texto, conv, temp, temp2;
+	ZZ pos, tam, pos2;
+	int indice;
+	string descifrado;
+	string ntemp = zztostring(n_priv);
+	int bloques = ntemp.size();
+
+	for (int i = 0; i < cifrado.size(); i += bloques) {
+		for (int j = 0; j < bloques; j++) {
+			temp += cifrado[i + j];
+		}
+		pos2 = stringtozz(temp);
+		pos2 = resto_chino(pos2);
+		temp2 = zztostring(pos2);
+		tam = ZZ(bloques - 1);
+		temp2 = igualar(temp2, tam);
+		conv += temp2;
+		temp.clear();
+		temp2.clear();
+	}
+
+	int tamabc = abecedario.size();
+	string tama = inttostring(tamabc);
+	tamabc = tama.size();
+	for (int i = 0; i < conv.size(); i += tamabc) {
+		for (int j = 0; j < tamabc; j++) {
+			temp += conv[i + j];
+		}
+		indice = stoi(temp);
+		temp2 = abecedario[indice];
+		descifrado += temp2;
+
+		temp.clear();
+	}
+
+	int sizedes = descifrado.size() - 1;
+	bool ga = descifrado[sizedes] == descifrado[sizedes - 1];
+	for (; ga == true; sizedes = descifrado.size() - 1, ga = descifrado[sizedes] == descifrado[sizedes - 1]) {
+		descifrado.pop_back();
+	}
+	return descifrado;
+}
+
+string RSA::descifrado_rubrica(string cifrado) {
+	string texto, conv, temp, temp2;
+	ZZ pos, tam, pos2;
+	int indice;
+	string descifrado;
+	string ntemp = zztostring(n_otro);
+	int bloques = ntemp.size();
+
+	for (int i = 0; i < cifrado.size(); i += bloques) {
+		for (int j = 0; j < bloques; j++) {
+			temp += cifrado[i + j];
+		}
+		pos2 = stringtozz(temp);
+		pos2 = modular_pow(pos2, clavepublica_otro, n_otro);
+		temp2 = zztostring(pos2);
+		tam = ZZ(bloques - 1);
+		temp2 = igualar(temp2, tam);
+		conv += temp2;
+		temp.clear();
+		temp2.clear();
+	}
+
+	int tamabc = abecedario.size();
+	string tama = inttostring(tamabc);
+	tamabc = tama.size();
+	for (int i = 0; i < conv.size(); i += tamabc) {
+		for (int j = 0; j < tamabc; j++) {
+			temp += conv[i + j];
+		}
+		indice = stoi(temp);
+		temp2 = abecedario[indice];
+		descifrado += temp2;
+
+		temp.clear();
+	}
+
+	int sizedes = descifrado.size() - 1;
+	bool ga = descifrado[sizedes] == descifrado[sizedes - 1];
+	for (; ga == true; sizedes = descifrado.size() - 1, ga = descifrado[sizedes] == descifrado[sizedes - 1]) {
+		descifrado.pop_back();
+	}
+	return descifrado;
+}
+
+int main() {
+	ZZ n_otrocifrado, clave_otro, cifrado, n_otrodescifrado, clave_otrodescifrado;
+	/////CIFRADO
+	cout<<"Para el cifrado: "<<endl<<"Coloque la N"<<endl;
+	cin>> n_otrocifrado;
+	cout<<"Coloque la clave publica (e)"<<endl;
+	cin>> clave_otro;
+	string mensaje, cifrado_rubrica, cifrado_firma;
+
+	RSA yo(ZZ(5));
+	RSA otro(n_otrocifrado, clave_otro);
+	mensaje = "The Data Encryption Standard (DES) is a symmetric-key algorithm for the encryption of digital data. Although its short key length of 56 bits makes it too insecure for modern applications, it has been highly influential in the advancement of cryptography.Developed in the early 1970s at IBM and based on an earlier design by Horst Feistel, the algorithm was submitted to the National Bureau of Standards (NBS) following the agencys invitation to propose a candidate for the protection of sensitive, unclassified electronic government data. In 1976, after consultation with the National Security Agency (NSA), the NBS selected a slightly modified version (strengthened against differential cryptanalysis, but weakened against brute-force attacks), which was published as an official Federal Information Processing Standard (FIPS) for the United States in 1977.The publication of an NSA-approved encryption standard led to its quick international adoption and widespread academic scrutiny. Controversies arose from classified design elements, a relatively short key length of the symmetric-key block cipher design, and the involvement of the NSA, raising suspicions about a backdoor. The S-boxes that had prompted those suspicions were designed by the NSA to remove a backdoor they secretly knew (differential cryptanalysis). However, the NSA also ensured that the key size was drastically reduced so that they could break the cipher by brute force attack.2 The intense academic scrutiny the algorithm received over time led to the modern understanding of block ciphers and their cryptanalysis.DES is insecure due to the relatively short 56-bit key size. In January 1999, distributed.net and the Electronic Frontier Foundation collaborated to publicly break a DES key in 22 hours and 15 minutes (see chronology). There are also some analytical results which demonstrate theoretical weaknesses in the cipher, although they are infeasible in practice. The algorithm is believed to be practically secure in the form of Triple DES, although there are theoretical attacks. This cipher has been superseded by the Advanced Encryption Standard (AES). DES has been withdrawn as a standard by the National Institute of Standards and Technology. Paul Pharaf SUPO PORTUGAL 181-10-42843";
+	cifrado_rubrica = otro.cifrado_firma(mensaje);
+	cifrado_firma = yo.cifrado_firma(cifrado_rubrica);
+	cout << "Cifrado: " << cifrado_firma << endl;
+	
+	/////DESCIFRADO
+	cout << "Para el descifrado: " << endl << "Coloque la N" << endl;
+	cin >> n_otrodescifrado;
+	cout << "Coloque la clave publica (e)" << endl;
+	cin >> clave_otrodescifrado;
+	string mensaje, descifrado_rubrica, descifrado_firma;
+
+	RSA yo_2(ZZ(5));
+	RSA otro_2(n_otrocifrado, clave_otrodescifrado);
+	mensaje = "1139696099600724142917761615610184966247844381943828250226496948801386235341623241179311711026389357131926630733877464790866172221145837569718145860292250442999256599975962781766307493277752481041224104234849006456196128424952151823627173873895356490621149335631507666619741304473572068095873468254633946842059200405736307874739560921415349619783072087923166421922338138495341725719053901893719991084552738692046648802232987075716500840016165238893360264153819313169557891515061143889473239549634767390969824273160706984625021302537536223247978819409147445384470246732267859154906255579139784592133012897974554523873610034146934828428700663995181461270822374867837594603974238126639145729543614999386508768106993342611349188872046813701293483940404073707243694670644013158422514908939418935201997711283919574730179723664745788428838172271921460596014500226698180929584587956026922416750354933949902915105232693753493855110751914037470258206641845272777625682777651633151969643804486732534156784352852906221803967008066658438388728992257822317454154194309937150627646956901292994814128318123866433405252252466341285831876919630112631335298530510300121052808388403000718950347587760101266177383863530219573707723884859985353700129923777003616014897824042641663382426060090051373523627043401764805215973507469665923213114635597205502424923333960198796889564252096360838745477162164550036793440573572717790008660101980074288539837296521618255268978385921096239726502417091996463555694598285832598083761425738115670383340755025766899939806761357362048686339197161698866068764773073839372195243389652334185081808491065736821737294319119941843081749848293257779998573873615555061559108392915562839307914780174485584550746455161377285255187451670452179475168262664144029525430160086142622245506344152534897516472632203215635874917408409937047031513542524231081111024383938864880248124929952068546431035730833100846515989930686188789348617225236010718691088839014594109703616661400207860545182212032629097368405818185488062839534213906185090343147072058071321615803186860810041382949967060994423964071777585181135265848712822702258537490736283003691753664742515312545992662107605304341429189033687741995240139595001027035514496031680510108912905772967539204347718427391976574421277480936643265042885997753344945439886002162818443930468388534326035643494130652573635474680396666894526840568702007476848230586183358579804858843991353253316629459955591262530567405635807115842487506244641033718881852734200291825350952978754603565262773759036505165027716333819292065422342359632526192167978576444386473978017554089322616046172323516887494244100871101445714636276961972858282423953597354285565417533200307394931506938942723898746834780400048833079871512933867247824711789099476723585209462072932576679996156498372851927221764393282412803747203815405361983801040698234339147075678237133531736888666815738562078594226188331788236855988733969099043111156733584774093174113834154035146273903422873655479242323021847461807666887363755887310015838253587406139816771951153425340773284083567731899697353766040536943888256986816365182197667827272410049372027101934789811379528930120037306952513729517541326382083282600620735389468942107826484865886851790231249531602255987247316176520362125033832864419009791177102309104412105862980018153924712019684196273022222038066969036103663768585219264897844663998847754365974488473667299442941997005976462401460788074537710653552305852745907267945668193602363151324455485908294582193306581723239510424214899782697920636562019511503138849025165999603920800157219184706621800125983330592497218502958873804033223878179626359493743006729711871114376778206158479528447673854989540230821910523042329162284608404234177261835242494556277394530252561478362787714463059278923405379196354502286193469895667015596096611874300161060908182894009462504518938155474010086095751990048858201805079134085343692835439741674737725316748426014959607010461669529336320104600901381506569544491093627564317954592832980406620546550972879663540921994775166075061206427683628930157527888273731534913139416289636241258648217903998949821399274247769530972761227931602616543180431773871034771868462990586476087381452274729202032634741833717589171133768594745116368111316185628600716954278539055689614657518442569603282506509894709900743567393361972019409518280786220952202660928893790686605306933911664054699574815917061405858287826850101995408431145090032826335256561252796114355964732652992092626764786401469765260528564182598087943347555194908590918217545079162177133274615380490028319569523763773983440917578089464023791423898076720523744257601966392983701007172903916639434212684811849464945886075063489015771321912188981218456285475645337678451168100709572635168372866011368917332988004864313955147904183055125314849928588538978913085669129920000209320128112099453036576835511400349366834272022846900091160853739855183888301091687174945564372";
+	descifrado_rubrica = otro.cifrado_firma(mensaje);
+	descifrado_firma = yo.cifrado_firma(descifrado_rubrica);
+	cout << "Descifrado: " << descifrado_firma << endl;
+	
+}
